@@ -91,4 +91,4 @@ local function fly(target)
     end)
 end
 
-return {tp = tp, fly = fly}
+return {tp = tp, fly = fly, tp_v2 = tp_v2}
