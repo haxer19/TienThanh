@@ -92,6 +92,7 @@ local function fly(target)
     end)
 end
 
+-- Pos Saver
 local savedPos = {}
 
 local function save(name)
@@ -124,4 +125,8 @@ local function list()
     print("[ end list ]")
 end
 
-return {tp = tp, fly = fly, tp_v2 = tp_v2, save = save, back = back, clear = clear, list = list}
+local function getPos()
+    return savedPos
+end
+
+return {tp = tp, fly = fly, tp_v2 = tp_v2, save = save, back = back, clear = clear, list = list, getPos = getPos}
