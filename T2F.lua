@@ -6,11 +6,9 @@ local function tp(target)
     local character = player.Character
     local humanoidRootPart = character and character:FindFirstChild("HumanoidRootPart")
     if not character or not humanoidRootPart then
-        warn("Không tìm thấy nhân vật hoặc HumanoidRootPart")
         return
     end
     if not target or not target:IsA("BasePart") then
-        warn("Đích đến không hợp lệ. Vui lòng cung cấp một BasePart")
         return
     end
     humanoidRootPart.CFrame = target.CFrame + Vector3.new(0, 3, 0)
