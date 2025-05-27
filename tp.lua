@@ -16,4 +16,4 @@ local function tp(target)
     humanoidRootPart.CFrame = target.CFrame + Vector3.new(0, 3, 0) 
 end
 
-_G.tp = tp
+return tp
