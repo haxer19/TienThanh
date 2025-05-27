@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
 
 local function tp(target)
     local player = Players.LocalPlayer
@@ -91,4 +92,36 @@ local function fly(target)
     end)
 end
 
-return {tp = tp, fly = fly, tp_v2 = tp_v2}
+local savedPos = {}
+
+local function save(name)
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        savedPos[name] = LocalPlayer.Character.HumanoidRootPart.Position
+    end
+end
+
+local function back(name)
+    if savedPos[name] then
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(savedPos[name])
+        end
+    end
+end
+
+local function clear()
+    savedPos = {}
+end
+
+local function list()
+    print("[ location list ]")
+    if next(savedPos) == nil then
+        print("...")
+    else
+        for name, pos in pairs(savedPos) do
+            print("  " .. name .. ": " .. tostring(pos))
+        end
+    end
+    print("[ end list ]")
+end
+
+return {tp = tp, fly = fly, tp_v2 = tp_v2, save = save, back = back, clear = clear, list = list}
