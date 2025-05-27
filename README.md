@@ -1,6 +1,6 @@
 ## T2F
 ```lua
-local T2F = loadstring(game:HttpGet("https://raw.githubusercontent.com/haxer19/TienThanh/main/tp.lua"))()
+local T2F = loadstring(game:HttpGet("https://raw.githubusercontent.com/haxer19/TienThanh/main/T2F.lua"))()
 local Tp = T2F.tp
 -- local Tp2 = T2F.tp_v2
 local Fly = T2F.fly
@@ -28,52 +28,82 @@ pos.list()
 
 ---
 
-### gui
+### location
 ```lua
-Tabs.MainTab:TextBox({
-    Title = "Tên vị trí",
-    Placeholder = "Nhập tên vị trí (VD: vt1)",
-    Callback = function(value)
-        _G.positionName = value
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+local T2F = loadstring(game:HttpGet("https://raw.githubusercontent.com/haxer19/TienThanh/main/T2F.lua"))()
+
+local Window = WindUI:CreateWindow({
+    Title = "PosSaver",
+    Icon = "",
+    Author = "Tien Thanh",
+    Folder = "ABC",
+    Size = UDim2.fromOffset(540, 340),
+    Transparent = true,
+    Theme = "Dark",
+    SideBarWidth = 200,
+    HasOutline = true,
+})
+
+local Tabs = {
+    Main = Window:Tab({ Title = "Main", Icon = "user" }),
+}
+
+local currentName = ""
+
+Tabs.Main:Input({
+    Title = "Name",
+    Value = "",
+    Placeholder = "Enter Name",
+    Callback = function(input)
+        currentName = input
     end
 })
 
-Tabs.MainTab:Button({
-    Title = "Lưu Vị Trí",
+local posDropdown
+
+Tabs.Main:Button({
+    Title = "Name Save",
     Callback = function()
-        if _G.positionName and _G.positionName ~= "" then
-            pos.save(_G.positionName)
-        else
-            warn("Vui lòng nhập tên vị trí!")
+        if currentName ~= "" then
+            T2F.save(currentName)
+            local positions = T2F.getPos()
+            local posNames = {}
+            for name, _ in pairs(positions) do
+                table.insert(posNames, name)
+            end
+            posDropdown:Refresh(posNames)
         end
     end
 })
 
-Tabs.MainTab:Dropdown({
-    Title = "Chọn Vị Trí để Quay Lại",
+posDropdown = Tabs.Main:Dropdown({
+    Title = "List",
     Values = {},
+    Value = "",
     Callback = function(option)
-        pos.back(option)
-    end
-})
-
-Tabs.MainTab:Button({
-    Title = "Cập Nhật Danh Sách",
-    Callback = function()
-        local positionNames = {}
-        for name, _ in pairs(pos.getPos or {}) do
-            table.insert(positionNames, name)
+        if option ~= "" then
+            T2F.back(option)
         end
-        Tabs.MainTab:UpdateDropdown("Chọn Vị Trí để Quay Lại", positionNames)
-        pos.list()
     end
 })
 
-Tabs.MainTab:Button({
-    Title = "Xóa Tất Cả Vị Trí",
+Tabs.Main:Button({
+    Title = "Del All",
     Callback = function()
-        pos.clear()
-        Tabs.MainTab:UpdateDropdown("Chọn Vị Trí để Quay Lại", {})
+        T2F.clear()
+        posDropdown:Refresh({""})
     end
 })
+
+local function updateDropdown()
+    local positions = T2F.getPos()
+    local posNames = {}
+    for name, _ in pairs(positions) do
+        table.insert(posNames, name)
+    end
+    posDropdown:Refresh(posNames)
+end
+
+updateDropdown()
 ```
