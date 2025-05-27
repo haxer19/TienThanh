@@ -13,6 +13,7 @@ local function tp(target)
     end
     humanoidRootPart.CFrame = target.CFrame + Vector3.new(0, 3, 0)
 end
+
 local function fly(target)
     local player = Players.LocalPlayer
     local character = player.Character
