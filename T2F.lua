@@ -22,21 +22,34 @@ local function fly(target)
     if not character or not humanoidRootPart then
         return
     end
-    
     if not target or not target:IsA("BasePart") then
         return
+    end
+    local originalCollisions = {}
+    for _, part in pairs(character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            originalCollisions[part] = part.CanCollide
+            part.CanCollide = false
+        end
     end
     local humanoid = character:FindFirstChildOfClass("Humanoid")
     if humanoid then
         humanoid.PlatformStand = true
     end
     local targetCFrame = target.CFrame + Vector3.new(0, 3, 0)
-    local tweenInfo = TweenInfo.new(2,Enum.EasingStyle.Quad,Enum.EasingDirection.InOut)
+    
+    local tweenInfo = TweenInfo.new(2, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
+    
     local tween = TweenService:Create(humanoidRootPart, tweenInfo, {CFrame = targetCFrame})
     tween:Play()
     tween.Completed:Connect(function()
         if humanoid then
             humanoid.PlatformStand = false
+        end
+        for part, canCollide in pairs(originalCollisions) do
+            if part.Parent then 
+                part.CanCollide = canCollide
+            end
         end
     end)
 end
