@@ -1,6 +1,7 @@
 ## teleport part
 ```lua
-local tp = loadstring(game:HttpGet("https://raw.githubusercontent.com/haxer19/TienThanh/main/tp.lua"))()
+local T2F = loadstring(game:HttpGet("https://raw.githubusercontent.com/haxer19/TienThanh/main/tp.lua"))()
 
-tp(path)
+T2F(path)
+T2F(path)
 ```
