@@ -129,6 +129,7 @@ local function getPos()
     return savedPos
 end
 
+-- tp to cf
 local function TpCFrame(x, y, z)
     local player = game.Players.LocalPlayer
     if not player then
