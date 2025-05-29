@@ -129,4 +129,16 @@ local function getPos()
     return savedPos
 end
 
-return {tp = tp, fly = fly, tp_v2 = tp_v2, save = save, back = back, clear = clear, list = list, getPos = getPos}
+local function TpCFrame(x, y, z)
+    local player = game.Players.LocalPlayer
+    if not player then
+        return
+    end
+    local character = player.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then
+        return
+    end
+    character:SetPrimaryPartCFrame(CFrame.new(x, y, z))
+end
+
+return {tp = tp, fly = fly, tp_v2 = tp_v2, save = save, back = back, clear = clear, list = list, getPos = getPos, TpCFrame = TpCFrame}
