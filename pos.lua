@@ -1,10 +1,13 @@
+-- Update: 29/05/25
+-- Make script: TienThanh
+
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local StarterGui = game:GetService("StarterGui")
 local GuiService = game:GetService("GuiService")
 local player = Players.LocalPlayer
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "PosUI"
+screenGui.Name = "Author: TienThanh"
 screenGui.IgnoreGuiInset = true
 screenGui.Parent = player.PlayerGui
 local frame = Instance.new("Frame")
