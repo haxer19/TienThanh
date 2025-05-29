@@ -4,6 +4,7 @@ local T2F = loadstring(game:HttpGet("https://raw.githubusercontent.com/haxer19/T
 local Tp = T2F.tp
 -- local Tp2 = T2F.tp_v2
 local Fly = T2F.fly
+local TC = T2F.TpCFrame
 local pos = {
     getPos = T2F.getPos,
     save = T2F.save,
@@ -14,7 +15,7 @@ local pos = {
 --[[
 teleport: Tp(path) 
 fly: Fly(path)
-
+teleport to CFrame: TC(x,y,z)
 
 Position Save :
 
