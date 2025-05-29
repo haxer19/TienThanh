@@ -2,13 +2,11 @@ local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local StarterGui = game:GetService("StarterGui")
 local GuiService = game:GetService("GuiService")
-
 local player = Players.LocalPlayer
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "Author: TienThanh"
+screenGui.Name = "PosUI"
 screenGui.IgnoreGuiInset = true
 screenGui.Parent = player.PlayerGui
-
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 200, 0, 100)
 frame.Position = UDim2.new(1, -210, 0.5, -50) 
@@ -46,7 +44,6 @@ copyButton.Parent = frame
 local copyCorner = Instance.new("UICorner")
 copyCorner.CornerRadius = UDim.new(0, 5)
 copyCorner.Parent = copyButton
-
 local closeButton = Instance.new("TextButton")
 closeButton.Size = UDim2.new(0, 25, 0, 25)
 closeButton.Position = UDim2.new(1, -30, 0, 5)
@@ -56,14 +53,13 @@ closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeButton.Font = Enum.Font.SourceSans
 closeButton.TextSize = 14
 closeButton.Parent = frame
-
 local closeCorner = Instance.new("UICorner")
 closeCorner.CornerRadius = UDim.new(0, 5)
 closeCorner.Parent = closeButton
-
 local dragging = false
 local dragStart = nil
 local startPos = nil
+local lastPos = frame.Position 
 
 local function dragUI(input)
     if dragging then
@@ -74,15 +70,14 @@ local function dragUI(input)
             startPos.Y.Scale,
             startPos.Y.Offset + delta.Y
         )
-        local screenSize = GuiService:GetScreenResolution()
+        local screenSize = GuiService:GetScreenResolution() or Vector2.new(1280, 720) 
         local frameSize = frame.AbsoluteSize
         newPos = UDim2.new(
-            math.clamp(newPos.X.Scale, 0, 1 - frameSize.X / screenSize.X),
-            math.clamp(newPos.X.Offset, 0, screenSize.X - frameSize.X),
-            math.clamp(newPos.Y.Scale, 0, 1 - frameSize.Y / screenSize.Y),
-            math.clamp(newPos.Y.Offset, 0, screenSize.Y - frameSize.Y)
+            0, math.clamp(newPos.X.Offset, 0, screenSize.X - frameSize.X),
+            0, math.clamp(newPos.Y.Offset, 0, screenSize.Y - frameSize.Y)
         )
         frame.Position = newPos
+        lastPos = newPos 
     end
 end
 
@@ -121,6 +116,7 @@ player.Chatted:Connect(function(message)
             frame.Visible = false
         else
             frame.Visible = true
+            frame.Position = lastPos 
             updCF()
         end
     end
@@ -140,6 +136,7 @@ copyButton.MouseButton1Click:Connect(function()
 end)
 
 closeButton.MouseButton1Click:Connect(function()
+    lastPos = frame.Position 
     frame.Visible = false
 end)
 
@@ -150,8 +147,8 @@ game:GetService("RunService").Heartbeat:Connect(function()
 end)
 
 local function adjScr()
-    local screenSize = GuiService:GetScreenResolution()
-    if screenSize and screenSize.Y < 600 then
+    local screenSize = GuiService:GetScreenResolution() or Vector2.new(1280, 720)
+    if screenSize.Y < 600 then
         frame.Size = UDim2.new(0, 180, 0, 90)
         textLabel.TextSize = 12
         copyButton.Size = UDim2.new(0, 50, 0, 20)
