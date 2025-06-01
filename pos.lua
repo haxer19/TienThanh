@@ -13,7 +13,7 @@ gui.ResetOnSpawn = false
 gui.Parent = player.PlayerGui
 
 local toggleButton = Instance.new("ImageButton")
-toggleButton.Size = UDim2.new(0, 40, 0, 40)
+toggleButton.Size = UDim2.new(0,50,0,50)
 toggleButton.Position = UDim2.new(0, 199, 0.5, -200)
 toggleButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 toggleButton.Image = "rbxassetid://124959055145335"
