@@ -1,11 +1,270 @@
+local Configs = {}
+
+do 
+    Configs.select=nil
+    Configs.esp=false
+    Configs.autofarm=false
+    Configs.autofly=false
+    Configs.walkspeed=16
+    Configs.flyspeed=100
+end
+
+plotid=game.Players.LocalPlayer:GetAttribute("PlotId")
+
+
+
+local function tp(player, target)
+    local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp or not target then return end
+
+    local pos
+
+    if typeof(target) == "CFrame" then
+        pos = target.Position
+
+    elseif typeof(target) == "Vector3" then
+        pos = target
+
+    elseif typeof(target) == "Instance" then
+        if target:IsA("Model") then
+            pos = target:GetPivot().Position
+
+        elseif target:IsA("BasePart") or target:IsA("Attachment") then
+            pos = target.Position
+
+        elseif target:IsA("ObjectValue") and target.Value then
+            return tp(player, target.Value)
+
+        elseif target:FindFirstChildWhichIsA("BasePart") then
+            return tp(player, target:FindFirstChildWhichIsA("BasePart"))
+
+        elseif target:FindFirstChild("Position") and typeof(target.Position) == "Vector3" then
+            pos = target.Position
+        end
+    end
+
+    if pos then
+        hrp.CFrame = CFrame.new(pos)
+    end
+end
+
+
+
+
+local function getOreNames()
+    local t, m = {}, {}
+    for _, v in ipairs(workspace:WaitForChild("PlacedOre"):GetChildren()) do
+        local n = v.Name
+        if not m[n] then
+            t[#t+1] = n
+            m[n] = true
+        end
+    end
+    return t
+end
+
+local ores = getOreNames()
+
+
+
+
+
+
+
+local rs = game:GetService("RunService")
+local oreFolder = workspace:WaitForChild("PlacedOre")
+local cam = workspace.CurrentCamera
+local p = game.Players.LocalPlayer
+local espList, espCon, hue = {}, nil, 0
+local rainbow = false
+
+local function clearESP()
+	for _, v in pairs(espList) do
+		if v.box then v.box:Destroy() end
+		if v.label then v.label:Destroy() end
+	end
+	espList = {}
+end
+
+local function isAlreadyESP(part)
+	for _, v in ipairs(espList) do
+		if v.part == part then return true end
+	end
+	return false
+end
+
+local function addESPToPart(part)
+	local box = Instance.new("BoxHandleAdornment")
+	box.Adornee = part
+	box.AlwaysOnTop = true
+	box.ZIndex = 10
+	box.Size = part.Size
+	box.Transparency = 0.2
+	box.Name = "ore"
+	box.Color3 = Color3.fromRGB(0, 255, 255)
+	box.Parent = part
+
+	local label = Instance.new("BillboardGui")
+	label.Adornee = part
+	label.AlwaysOnTop = true
+	label.Size = UDim2.new(0, 50, 0, 10)
+	label.StudsOffset = Vector3.new(0, part.Size.Y + 0.5, 0)
+	label.Parent = part
+
+	local text = Instance.new("TextLabel")
+	text.Text = ""
+	text.Size = UDim2.new(1, 0, 1, 0)
+	text.BackgroundTransparency = 1
+	text.TextColor3 = Color3.fromRGB(0, 255, 127)
+	text.Font = Enum.Font.Code
+	text.TextScaled = false
+	text.TextSize = 11
+	text.TextStrokeTransparency = 0.8
+	text.Parent = label
+
+	table.insert(espList, {box = box, label = label, text = text, part = part})
+end
+
+local function OreESP(oreName)
+	if espCon then espCon:Disconnect() end
+
+	espCon = rs.RenderStepped:Connect(function()
+		hue = (hue + 0.002) % 1
+		local plrPos = p.Character and p.Character:FindFirstChild("HumanoidRootPart") and p.Character.HumanoidRootPart.Position
+
+        
+		for _, ore in ipairs(oreFolder:GetChildren()) do
+			if ore.Name == oreName then
+				local parts = {}
+				if ore:IsA("Model") then
+					for _, v in ipairs(ore:GetDescendants()) do
+						if v:IsA("BasePart") and not isAlreadyESP(v) then
+							addESPToPart(v)
+						end
+					end
+				elseif ore:IsA("BasePart") and not isAlreadyESP(ore) then
+					addESPToPart(ore)
+				end
+			end
+		end
+
+		for _, v in ipairs(espList) do
+			if v.box and v.box.Parent and v.text and v.label and v.part then
+				if rainbow then
+					v.box.Color3 = Color3.fromHSV(hue, 0.6, 1)
+				end
+
+				if plrPos and v.part:IsDescendantOf(workspace) then
+					local dist = math.floor((v.part.Position - plrPos).Magnitude)
+					v.text.Text = dist .. "m"
+				end
+			end
+		end
+	end)
+end
+
+
+
+
+
+
+
+
+local p, rs, oref, run = game.Players.LocalPlayer, game:GetService("RunService"), workspace:WaitForChild("PlacedOre"), false
+
+local function getRandOre()
+    local o = oref:GetChildren()
+    return o[math.random(1, #o)]
+end
+
+local function setNoClip(state)
+    local chr = p.Character
+    if not chr then return end
+    for _, part in ipairs(chr:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = not state
+        end
+    end
+end
+
+local function flyToOre()
+    local h = p.Character and p.Character:FindFirstChild("HumanoidRootPart")
+    if not h then return end
+
+    local origin = h.CFrame
+    local target = getRandOre()
+    if not target then return end
+
+    local pos = target:IsA("Model") and target:GetPivot().Position or target.Position
+    run = true
+
+    local con
+    con = rs.Stepped:Connect(function()
+        if not run then con:Disconnect() return end
+        setNoClip(true)
+        local dir = (pos - h.Position).Unit
+        h.Velocity = dir * Configs.flyspeed
+        if (h.Position - pos).Magnitude <= 5 then
+            run = false
+            h.Velocity = Vector3.zero
+            task.wait(0.1)
+            h.CFrame = origin
+            setNoClip(false)
+            con:Disconnect()
+        end
+    end)
+end
+
+
+
+
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
+
+function gradient(text, startColor, endColor)
+    local result = ""
+    local length = #text
+    for i = 1, length do
+        local t = (i - 1) / math.max(length - 1, 1)
+        local r = math.floor((startColor.R + (endColor.R - startColor.R) * t) * 255)
+        local g = math.floor((startColor.G + (endColor.G - startColor.G) * t) * 255)
+        local b = math.floor((startColor.B + (endColor.B - startColor.B) * t) * 255)
+        local char = text:sub(i, i)
+        result = result .. "<font color=\"rgb(" .. r ..", " .. g .. ", " .. b .. ")\">" .. char .. "</font>"
+    end
+    return result
+end
+
+local Confirmed = false
+
+WindUI:Popup({
+    Title = "Hi " .. game.Players.LocalPlayer.DisplayName .. " !!",
+    Icon = "rbxassetid://101602269941993",
+    IconThemed = true,
+    Content = gradient(" Tien Thanh Vip Vo Co Lo HI HI HI ", Color3.fromHex("#00F5FF"), Color3.fromHex("#C86BFF")),
+    Buttons = {
+        {
+            Title = "Cancel",
+            Callback = function() end,
+            Variant = "Secondary",
+        },
+        {
+            Title = "Continue",
+            Icon = "arrow-right",
+            Callback = function() Confirmed = true end,
+            Variant = "Primary",
+        }
+    }
+})
+
+repeat wait() until Confirmed
 
 local Window = WindUI:CreateWindow({
     Title = "Ultimate Mining Tycoon",
     Icon = "rbxassetid://101602269941993",
     IconThemed = false,
     Author = "xhk",
-    Folder = "TienThanh",
+    Folder = "Haxer19",
     Size = UDim2.fromOffset(530,340),
     Theme = "Dark",
     SideBarWidth = 140,
@@ -13,265 +272,232 @@ local Window = WindUI:CreateWindow({
     ToggleKey = Enum.KeyCode.RightControl,
 })
 
-Window:EditOpenButton({
-    Title = "O",
-    Icon = "rbxassetid://101602269941993",
-    CornerRadius = UDim.new(0,10),
-    StrokeThickness = 2,
-    Color = ColorSequence.new(Color3.fromHex("00FF9F"),Color3.fromHex("00FFF7")),
-    Draggable = true,
-})
-
 WindUI:AddTheme({
     Name = "xhk",
-    Accent = "#00E6D2",            
+    Accent = "#00F5FF",            
     Outline = "#1E0F29",         
     Background = "#120A1A",        
     SecondaryBackground = "#1B1230",
-    Text = "#D4F9FF",               
-    PlaceholderText = "#7FCEDB"     
+    Text = "#E5F7FF",               
+    PlaceholderText = "#A77BFF"   
 })
 
 WindUI:SetTheme("xhk")
 
-local Tabs = {
-    Main = Window:Tab({ Title = "Main"}),
-    Config = Window:Tab({ Title = "Điều chỉnh"}),
-}
 
---
-plotid=game.Players.LocalPlayer:GetAttribute("PlotId")
-local function tp(p, t)
-    local hrp = p.Character and p.Character:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
-    
-    local pos = t.Position
-    hrp.CFrame = CFrame.new(pos)
+Window:EditOpenButton({
+    Title = "OPEN | xhk",
+    Icon = "rbxassetid://101602269941993",
+    CornerRadius = UDim.new(0,10),
+    StrokeThickness = 2,
+    Color = ColorSequence.new(
+        Color3.fromHex("00F5FF"), 
+        Color3.fromHex("C86BFF") 
+    ),
+    Draggable = true,
+})
+
+local Tabs = {}
+
+do
+    Tabs.Info = Window:Tab({ Title = "Info", Icon = "rbxassetid://7733964719" })
+    Tabs.Main = Window:Tab({ Title = "Main", Icon = "rbxassetid://7733960981" })
+    Tabs.Door = Window:Tab({ Title = "Door", Icon = "rbxassetid://7734058345" })
+    Tabs.Config = Window:Tab({ Title = "Config", Icon = "file-cog" })
 end
 
-local rs = getconnections or get_signal_cons
-local oldCons = {}
-local flyMode = false
+Window:SelectTab(1)
 
-local function disableAntiTP()
-    local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
-    if rs then
-        oldCons = {}
-        for _, con in ipairs(rs(hrp.Changed)) do
-            table.insert(oldCons, con)
-            con:Disable()
-        end
-        for _, con in ipairs(rs(hrp:GetPropertyChangedSignal("CFrame"))) do
-            table.insert(oldCons, con)
-            con:Disable()
-        end
-    end
-    for _, obj in ipairs(game:GetDescendants()) do
-        if obj:IsA("RemoteEvent") or obj:IsA("RemoteFunction") then
-            local n = string.lower(obj.Name)
-            if string.find(n, "tp") or string.find(n, "tele") or string.find(n, "pos") or string.find(n, "anti") then
-                obj:Destroy()
-            end
-        end
-    end
-end
+Tabs.Info:Section({Title = "Ultimate Mining Tycoon"})
+Tabs.Info:Paragraph({
+    Title = "Author: TienThanh",
+    Desc = "V1.1.0"
+})
 
-local function enableAntiTP()
-    for _, con in ipairs(oldCons) do
-        pcall(function() con:Enable() end)
-    end
-    oldCons = {}
-end
 
-local oreName,espOn,flying=nil,false,false
 
-local function ores()
-    local n,f={},{}
-    for _,o in ipairs(workspace.PlacedOre:GetChildren())do
-        if not f[o.Name]then
-            table.insert(n,o.Name)
-            f[o.Name]=true
+
+Tabs.Main:Section({Title = "Ores"})
+Tabs.Main:Dropdown({
+    Title = "Select Ore",
+    Values = getOreNames(),
+    Desc = "Chọn 1 ore",
+    Callback = function(opt)
+        Configs.select = opt
+        if Configs.esp then
+            OreESP(opt)
         end
     end
-    table.sort(n)
-    return n
-end
+})
 
-local function getO(name)
-    local l={}
-    for _,o in ipairs(workspace.PlacedOre:GetChildren())do
-        if o.Name==name then
-            table.insert(l,o)
+
+
+Tabs.Main:Toggle({
+    Title = "Esp ore",
+    Desc = "Hiển thị vị trí ore",
+    Default = false,
+    Callback = function(state)
+        Configs.esp = state
+        if state then
+            OreESP(Configs.select)
+        else
+            if espCon then espCon:Disconnect() espCon = nil end
+            clearESP()
         end
     end
-    return l
-end
+})
 
-local function addEsp(o)
-    if not espOn or o:FindFirstChild("esp") then return end
-    local h=Instance.new("Highlight")
-    h.Name="esp"
-    h.Parent=o
-    h.Adornee=o
-    h.DepthMode=Enum.HighlightDepthMode.AlwaysOnTop
-    h.OutlineTransparency=0
-    h.FillTransparency=0.5
-    task.spawn(function()
-        local hue=0
-        while espOn and h.Parent do
-            hue=(hue+1)%360
-            h.FillColor=Color3.fromHSV(hue/360,1,1)
-            h.OutlineColor=Color3.new(1,1,1)
-            task.wait(0.05)
-        end
-    end)
-end
 
-local function clrEsp()
-    for _,o in ipairs(workspace.PlacedOre:GetChildren())do
-        if o:FindFirstChild("esp")then o.esp:Destroy()end
-    end
-end
 
-local function updEsp()
-    if not espOn or not oreName then return end
-    for _,o in ipairs(workspace.PlacedOre:GetChildren())do
-        if o.Name==oreName and not o:FindFirstChild("esp")then
-            addEsp(o)
-        end
-    end
-end
 
-local function noclip(b)
-    local c=game.Players.LocalPlayer.Character
-    if not c then return end
-    for _,v in ipairs(c:GetDescendants())do
-        if v:IsA("BasePart")then
-            v.CanCollide=not b
-        end
-    end
-end
-
-local function fly(t)
-    local p = game.Players.LocalPlayer
-    local hrp = p.Character and p.Character:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
-    flyMode = true
-    disableAntiTP()
-    local sp = 500
-    while flyMode and t and t.Parent do
-        local pos = t.Position or (t.PrimaryPart and t.PrimaryPart.Position)
-        if not pos then break end
-        local d = pos - hrp.Position
-        if d.Magnitude < 5 then break end
-        hrp.CFrame = hrp.CFrame + d.Unit * sp * task.wait()
-    end
-    flyMode = false
-    enableAntiTP()
-end
+-- Tabs.Main:Section({Title = "Auto"})
+-- Tabs.Main:Toggle({
+--     Title = "Auto Farm",
+--     Desc = "Bật/Tắt - Farm",
+--     Default = false,
+--     Callback = function(state) 
+--         if state then 
+--         end
+--     end
+-- })
 
 Tabs.Main:Button({
-    Title = "Khoảng sản",
+    Title = "Sell Ore",
+    Default = false,
+    Callback = function() 
+
+local p = game.Players.LocalPlayer
+local c = p.Character or p.CharacterAdded:Wait()
+local h = c:WaitForChild("HumanoidRootPart")
+local oldpos = h.CFrame
+
+tp(p, workspace.Placeables[plotid].UnloaderSystem.Unloader.Hitbox)
+
+local a = p:WaitForChild("PlayerGui"):WaitForChild("ProximityPrompts")
+    :WaitForChild("Prompt").Frame.TextFrame:WaitForChild("ActionText")
+local v = game:GetService("VirtualInputManager")
+
+repeat
+    if a.Text == "Add Items" and a.Visible then
+        v:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+        task.wait(0.03)
+        v:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+    end
+    task.wait(0.1)
+until a.Text ~= "Add Items" or not a.Visible
+
+h.CFrame = oldpos
+
+    end
+})
+
+
+Tabs.Main:Section({Title = "Teleport Ore"})
+Tabs.Main:Button({
+    Title = "Auto TP",
+    Default = false,
+    Callback = function() 
+        tp(game.Players.LocalPlayer,workspace.PlacedOre:GetChildren()[math.random(1, #workspace.PlacedOre:GetChildren())])
+    end
+})
+
+
+Tabs.Main:Section({Title = "Fly Ore"})
+Tabs.Main:Toggle({
+    Title = "Auto Fly",
+    Desc = "Tắt nếu muốn dừng bay",
+    Default = false,
+    Callback = function(state)
+        if state then 
+            flyToOre()
+        end
+    end
+})
+
+
+
+
+Tabs.Door:Section({Title = "Home"})
+Tabs.Door:Button({
+    Title = "Back Home",
+    Desc = "Quay về",
+    Callback = function()
+        tp(game.Players.LocalPlayer,workspace.Plots[plotid].Centre)
+    end
+})
+
+
+
+Tabs.Door:Section({Title = "Farm Location"})
+Tabs.Door:Button({
+    Title = "Dịch chuyển tới vị trí farm",
     Callback = function() tp(game.Players.LocalPlayer,CFrame.new(-1853.91711, 4.88865042, -179.539627, 1, 0, 0, 0, 1, 0, 0, 0, 1)) end
 })
 
-local oldPos = nil
 
-Tabs.Main:Button({
-    Title = "Bán khoáng sản",
+Tabs.Door:Section({Title = "Store"})
+Tabs.Door:Dropdown({
+    Title = "Select NPC",
+    Values = {"Backpack Store","Explosives Store","Pickaxe Store","Rebirth Store"},
+    Desc = "NPC",
+    Callback = function(opt)
+        
+        tp(game.Players.LocalPlayer,workspace[opt])
+    end
+})
+
+
+
+
+
+Tabs.Config:Section({Title = "Features"})
+Tabs.Config:Button({
+    Title = "Anti AFK",
+    Desc = "Tránh mất kết nối roblox",
     Callback = function()
-        local lp = game.Players.LocalPlayer
-        local hrp = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
-        if not hrp then return end
-        oldPos = hrp.CFrame
-        tp(lp,workspace.Placeables[plotid].UnloaderSystem.Unloader.Hitbox)
+        local vu = game:GetService("VirtualUser")
+        game.Players.LocalPlayer.Idled:Connect(function()
+            vu:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+            task.wait(1)
+            vu:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+        end)
     end
 })
 
-Tabs.Main:Button({
-    Title = "Quay lại chỗ cũ",
+Tabs.Config:Button({
+    Title = "Roblox FPS Booster",
+    Desc = "Giảm lag trò chơi",
     Callback = function()
-        local lp = game.Players.LocalPlayer
-        local hrp = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
-        if not hrp then return end
-        if oldPos then
-            hrp.CFrame = oldPos
-        else
-            oldPos = hrp.CFrame
-        end
-    end
-})
-
-Tabs.Main:Button({
-    Title = "PICKAXE",
-    Callback = function() tp(game.Players.LocalPlayer,workspace["Pickaxe Store"].PickaxeLocation) end
-})
-
-Tabs.Main:Button({
-    Title = "Túi đồ",
-    Callback = function() tp(game.Players.LocalPlayer,workspace["Backpack Store"].ActivationPoint) end
-})
-
-Tabs.Main:Dropdown({
-    Title="Chọn Ore",
-    Values=ores(),
-    Value=nil,
-    Callback=function(v)
-        oreName=v
-        clrEsp()
-        if espOn then updEsp() end
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/vexroxd/My-Script-/main/roblox%20fps%20unlocker%20script.lua'))()
     end
 })
 
 
-Tabs.Main:Button({
-    Title = "Bay tới Ore đã chọn",
-    Callback = function()
-        if not oreName then return end
-        local o = getO(oreName)
-        if #o == 0 then return end
-        fly(o[math.random(1, #o)])
-    end
-})
-
-
-Tabs.Main:Button({
-    Title = "Reset Player",
-    Callback = function()
-        local lp = game.Players.LocalPlayer
-        lp.Character:BreakJoints()
-    end
-})
-
-Tabs.Config:Toggle({
-    Title="ESP Ore",
-    Value=false,
-    Callback=function(s)
-        espOn=s
-        if espOn then
-            task.spawn(function()
-                while espOn do
-                    updEsp()
-                    task.wait(0.2)
-                end
-            end)
-        else
-            clrEsp()
-        end
-    end
-})
-
+Tabs.Config:Section({Title = "Speed"})
 Tabs.Config:Slider({
-    Title = "Walkspeed",
+    Title = "Walk Speed",
+    Step = 1,
     Value = {
         Min = 16,
-        Max = 200,
+        Max = 1000,
         Default = 16,
     },
+    Callback = function(value)
+        Configs.walkspeed = value
+        local char = game.Players.LocalPlayer.Character
+        if char then
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if hum then
+                hum.WalkSpeed = value
+            end
+        end
+    end
+})
+Tabs.Config:Slider({
+    Title = "Fly Speed",
+    Step = 5,
+    Value = {Min = 50, Max = 1000, Default = 100},
     Callback = function(v)
-        local c = game.Players.LocalPlayer.Character
-        local h = c and c:FindFirstChildOfClass("Humanoid")
-        if h then h.WalkSpeed = v end
+        Configs.flyspeed = v
     end
 })
