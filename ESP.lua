@@ -1,3 +1,4 @@
+--Settings--
 local ESP = {
     Enabled = false,
     Boxes = true,
@@ -76,22 +77,13 @@ function ESP:Toggle(bool)
     self.Enabled = bool
     if not bool then
         for i,v in pairs(self.Objects) do
-            if v.Type == "Box" then
+            if v.Type == "Box" then --fov circle etc
                 if v.Temporary then
                     v:Remove()
                 else
-                    for _,comp in pairs(v.Components) do
-                        comp.Visible = false
+                    for i,v in pairs(v.Components) do
+                        v.Visible = false
                     end
-                end
-            end
-        end
-    else
-        -- Re-enable visibility for existing boxes when turning ESP back on
-        for i,v in pairs(self.Objects) do
-            if v.Type == "Box" and not v.Temporary then
-                for _,comp in pairs(v.Components) do
-                    comp.Visible = true
                 end
             end
         end
@@ -104,47 +96,37 @@ end
 
 function ESP:AddObjectListener(parent, options)
     local function NewListener(c)
-        if type(options.Type) == "string" and c:IsA(options.Type) or options.Type == nil then
-            if type(options.Name) == "string" and c.Name == options.Name or options.Name == nil then
-                if not options.Validator or options.Validator(c) then
-                    local box = ESP:Add(c, {
-                        PrimaryPart = type(options.PrimaryPart) == "string" and c:WaitForChild(options.PrimaryPart) or type(options.PrimaryPart) == "function" and options.PrimaryPart(c),
-                        Color = type(options.Color) == "function" and options.Color(c) or options.Color,
-                        ColorDynamic = options.ColorDynamic,
-                        Name = type(options.CustomName) == "function" and options.CustomName(c) or options.CustomName,
-                        IsEnabled = options.IsEnabled,
-                        RenderInNil = options.RenderInNil
-                    })
-                    if options.OnAdded then
-                        coroutine.wrap(options.OnAdded)(box)
+        if ESP.Enabled then
+            if type(options.Type) == "string" and c:IsA(options.Type) or options.Type == nil then
+                if type(options.Name) == "string" and c.Name == options.Name or options.Name == nil then
+                    if not options.Validator or options.Validator(c) then
+                        local box = ESP:Add(c, {
+                            PrimaryPart = type(options.PrimaryPart) == "string" and c:WaitForChild(options.PrimaryPart) or type(options.PrimaryPart) == "function" and options.PrimaryPart(c),
+                            Color = type(options.Color) == "function" and options.Color(c) or options.Color,
+                            ColorDynamic = options.ColorDynamic,
+                            Name = type(options.CustomName) == "function" and options.CustomName(c) or options.CustomName,
+                            IsEnabled = options.IsEnabled,
+                            RenderInNil = options.RenderInNil
+                        })
+                        if options.OnAdded then
+                            coroutine.wrap(options.OnAdded)(box)
+                        end
                     end
                 end
             end
         end
     end
 
-    local function RemovedListener(c)
-        local box = ESP:GetBox(c)
-        if box then
-            box:Remove()
-        end
-    end
-
     if options.Recursive then
-        local descAdded = parent.DescendantAdded:Connect(NewListener)
-        local descRemoved = parent.DescendantRemoving:Connect(RemovedListener)
+        parent.DescendantAdded:Connect(NewListener)
         for i,v in pairs(parent:GetDescendants()) do
             coroutine.wrap(NewListener)(v)
         end
-        -- Store connections for cleanup
-        return {DescendantAdded = descAdded, DescendantRemoving = descRemoved}
     else
-        local childAdded = parent.ChildAdded:Connect(NewListener)
-        local childRemoved = parent.ChildRemoved:Connect(RemovedListener)
+        parent.ChildAdded:Connect(NewListener)
         for i,v in pairs(parent:GetChildren()) do
             coroutine.wrap(NewListener)(v)
         end
-        return {ChildAdded = childAdded, ChildRemoved = childRemoved}
     end
 end
 
@@ -162,6 +144,7 @@ end
 
 function boxBase:Update()
     if not self.PrimaryPart then
+        --warn("not supposed to print", self.Object)
         return self:Remove()
     end
 
@@ -200,6 +183,7 @@ function boxBase:Update()
         color = ESP.HighlightColor
     end
 
+    --calculations--
     local cf = self.PrimaryPart.CFrame
     if ESP.FaceCamera then
         cf = CFrame.new(cf.p, cam.CFrame.p)
@@ -282,7 +266,7 @@ function ESP:Add(obj, options)
     local box = setmetatable({
         Name = options.Name or obj.Name,
         Type = "Box",
-        Color = options.Color,
+        Color = options.Color --[[or self:GetColor(obj)]],
         Size = options.Size or self.BoxSize,
         Object = obj,
         Player = options.Player or plrs:GetPlayerFromCharacter(obj),
@@ -300,21 +284,21 @@ function ESP:Add(obj, options)
 
     box.Components["Quad"] = Draw("Quad", {
         Thickness = self.Thickness,
-        Color = box.Color or self:GetColor(obj),
+        Color = color,
         Transparency = 1,
         Filled = false,
         Visible = self.Enabled and self.Boxes
     })
     box.Components["Name"] = Draw("Text", {
 		Text = box.Name,
-		Color = box.Color or self:GetColor(obj),
+		Color = box.Color,
 		Center = true,
 		Outline = true,
         Size = 19,
         Visible = self.Enabled and self.Names
 	})
 	box.Components["Distance"] = Draw("Text", {
-		Color = box.Color or self:GetColor(obj),
+		Color = box.Color,
 		Center = true,
 		Outline = true,
         Size = 19,
@@ -322,8 +306,8 @@ function ESP:Add(obj, options)
 	})
 	
 	box.Components["Tracer"] = Draw("Line", {
-		Thickness = self.Thickness,
-		Color = box.Color or self:GetColor(obj),
+		Thickness = ESP.Thickness,
+		Color = box.Color,
         Transparency = 1,
         Visible = self.Enabled and self.Tracers
     })
@@ -374,54 +358,17 @@ local function CharAdded(char)
         })
     end
 end
-
 local function PlayerAdded(p)
     p.CharacterAdded:Connect(CharAdded)
     if p.Character then
         coroutine.wrap(CharAdded)(p.Character)
     end
 end
-
--- Initialize player tracking
-local playerConnections = {}
-for _, v in pairs(plrs:GetPlayers()) do
+plrs.PlayerAdded:Connect(PlayerAdded)
+for i,v in pairs(plrs:GetPlayers()) do
     if v ~= plr then
-        playerConnections[v] = v.CharacterAdded:Connect(CharAdded)
-        if v.Character then
-            coroutine.wrap(CharAdded)(v.Character)
-        end
+        PlayerAdded(v)
     end
-end
-plrs.PlayerAdded:Connect(function(p)
-    if p ~= plr then
-        playerConnections[p] = p.CharacterAdded:Connect(CharAdded)
-        if p.Character then
-            coroutine.wrap(CharAdded)(p.Character)
-        end
-    end
-end)
-plrs.PlayerRemoving:Connect(function(p)
-    if playerConnections[p] then
-        playerConnections[p]:Disconnect()
-        playerConnections[p] = nil
-    end
-    local box = ESP:GetBox(p.Character)
-    if box then
-        box:Remove()
-    end
-end)
-
--- Cleanup function
-function ESP:Cleanup()
-    self:Toggle(false)
-    for _, v in pairs(self.Objects) do
-        v:Remove()
-    end
-    self.Objects = setmetatable({}, {__mode="kv"})
-    for _, conn in pairs(playerConnections) do
-        conn:Disconnect()
-    end
-    playerConnections = {}
 end
 
 game:GetService("RunService").RenderStepped:Connect(function()
