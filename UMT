@@ -49,74 +49,158 @@ local function tp(p, t)
     hrp.CFrame = CFrame.new(pos)
 end
 
-local espEnabled = true
+local rs = getconnections or get_signal_cons
+local oldCons = {}
+local flyMode = false
 
-local function esp(o)
-    if not espEnabled then return end
-    local b = Instance.new("BillboardGui")
-    b.Parent = o
-    b.Adornee = o
-    b.Size = UDim2.new(2, 0, 2, 0)
-    b.AlwaysOnTop = true
-    local f = Instance.new("Frame")
-    f.Parent = b
-    f.Size = UDim2.new(1, 0, 1, 0)
-    f.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    f.BackgroundTransparency = 0.5
-    local t = Instance.new("TextLabel")
-    t.Parent = f
-    t.Size = UDim2.new(1, 0, 1, 0)
-    t.Text = o.BrickColor.Name
-    t.TextColor3 = Color3.fromRGB(255, 255, 255)
-    t.TextSize = 12
-    t.BackgroundTransparency = 1
-    t.Font = Enum.Font.GothamBold
-    local aura = Instance.new("UIStroke")
-    aura.Parent = f
-    aura.Thickness = 2
-    aura.Transparency = 0
-    aura.Color = Color3.fromRGB(0, 255, 255)
+local function disableAntiTP()
+    local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    if rs then
+        oldCons = {}
+        for _, con in ipairs(rs(hrp.Changed)) do
+            table.insert(oldCons, con)
+            con:Disable()
+        end
+        for _, con in ipairs(rs(hrp:GetPropertyChangedSignal("CFrame"))) do
+            table.insert(oldCons, con)
+            con:Disable()
+        end
+    end
+    for _, obj in ipairs(game:GetDescendants()) do
+        if obj:IsA("RemoteEvent") or obj:IsA("RemoteFunction") then
+            local n = string.lower(obj.Name)
+            if string.find(n, "tp") or string.find(n, "tele") or string.find(n, "pos") or string.find(n, "anti") then
+                obj:Destroy()
+            end
+        end
+    end
+end
+
+local function enableAntiTP()
+    for _, con in ipairs(oldCons) do
+        pcall(function() con:Enable() end)
+    end
+    oldCons = {}
+end
+
+local oreName,espOn,flying=nil,false,false
+
+local function ores()
+    local n,f={},{}
+    for _,o in ipairs(workspace.PlacedOre:GetChildren())do
+        if not f[o.Name]then
+            table.insert(n,o.Name)
+            f[o.Name]=true
+        end
+    end
+    table.sort(n)
+    return n
+end
+
+local function getO(name)
+    local l={}
+    for _,o in ipairs(workspace.PlacedOre:GetChildren())do
+        if o.Name==name then
+            table.insert(l,o)
+        end
+    end
+    return l
+end
+
+local function addEsp(o)
+    if not espOn or o:FindFirstChild("esp") then return end
+    local h=Instance.new("Highlight")
+    h.Name="esp"
+    h.Parent=o
+    h.Adornee=o
+    h.DepthMode=Enum.HighlightDepthMode.AlwaysOnTop
+    h.OutlineTransparency=0
+    h.FillTransparency=0.5
     task.spawn(function()
-        local hue = 0
-        while espEnabled and aura.Parent do
-            hue = (hue + 1) % 360
-            aura.Color = Color3.fromHSV(hue/360, 1, 1)
+        local hue=0
+        while espOn and h.Parent do
+            hue=(hue+1)%360
+            h.FillColor=Color3.fromHSV(hue/360,1,1)
+            h.OutlineColor=Color3.new(1,1,1)
             task.wait(0.05)
         end
     end)
 end
 
-local function upd()
-    if not espEnabled then return end
-    for _, o in pairs(workspace.PlacedOre:GetChildren()) do
-        if not o:FindFirstChild("BillboardGui") then
-            esp(o)
+local function clrEsp()
+    for _,o in ipairs(workspace.PlacedOre:GetChildren())do
+        if o:FindFirstChild("esp")then o.esp:Destroy()end
+    end
+end
+
+local function updEsp()
+    if not espOn or not oreName then return end
+    for _,o in ipairs(workspace.PlacedOre:GetChildren())do
+        if o.Name==oreName and not o:FindFirstChild("esp")then
+            addEsp(o)
         end
     end
 end
 
-local function disesp()
-    espEnabled = false
-    for _, o in pairs(workspace.PlacedOre:GetChildren()) do
-        if o:FindFirstChild("BillboardGui") then
-            o.BillboardGui:Destroy()
+local function noclip(b)
+    local c=game.Players.LocalPlayer.Character
+    if not c then return end
+    for _,v in ipairs(c:GetDescendants())do
+        if v:IsA("BasePart")then
+            v.CanCollide=not b
         end
     end
 end
 
-workspace.PlacedOre.ChildAdded:Connect(function(o)
-    if espEnabled then
-        upd()
+local function fly(t)
+    local p = game.Players.LocalPlayer
+    local hrp = p.Character and p.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    flyMode = true
+    disableAntiTP()
+    local sp = 500
+    while flyMode and t and t.Parent do
+        local pos = t.Position or (t.PrimaryPart and t.PrimaryPart.Position)
+        if not pos then break end
+        local d = pos - hrp.Position
+        if d.Magnitude < 5 then break end
+        hrp.CFrame = hrp.CFrame + d.Unit * sp * task.wait()
     end
-end)
+    flyMode = false
+    enableAntiTP()
+end
 
 Tabs.Main:Button({
     Title = "Khoảng sản",
     Callback = function() tp(game.Players.LocalPlayer,CFrame.new(-1853.91711, 4.88865042, -179.539627, 1, 0, 0, 0, 1, 0, 0, 0, 1)) end
 })
+
+local oldPos = nil
+
 Tabs.Main:Button({
-    Title = "Bán khoảng sản",
-    Callback = function() tp(game.Players.LocalPlayer,workspace.Placeables[plotid].UnloaderSystem.Unloader.Hitbox) end
+    Title = "Bán khoáng sản",
+    Callback = function()
+        local lp = game.Players.LocalPlayer
+        local hrp = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        oldPos = hrp.CFrame
+        tp(lp,workspace.Placeables[plotid].UnloaderSystem.Unloader.Hitbox)
+    end
+})
+
+Tabs.Main:Button({
+    Title = "Quay lại chỗ cũ",
+    Callback = function()
+        local lp = game.Players.LocalPlayer
+        local hrp = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        if oldPos then
+            hrp.CFrame = oldPos
+        else
+            oldPos = hrp.CFrame
+        end
+    end
 })
 
 Tabs.Main:Button({
@@ -129,23 +213,65 @@ Tabs.Main:Button({
     Callback = function() tp(game.Players.LocalPlayer,workspace["Backpack Store"].ActivationPoint) end
 })
 
+Tabs.Main:Dropdown({
+    Title="Chọn Ore",
+    Values=ores(),
+    Value=nil,
+    Callback=function(v)
+        oreName=v
+        clrEsp()
+        if espOn then updEsp() end
+    end
+})
+
+
 Tabs.Main:Button({
-    Title = "Khoảng sản hiếm",
+    Title = "Bay tới Ore đã chọn",
     Callback = function()
-      local ores=workspace.PlacedOre:GetChildren()
-      tp(game.Players.LocalPlayer,ores[math.random(1,#ores)]) 
+        if not oreName then return end
+        local o = getO(oreName)
+        if #o == 0 then return end
+        fly(o[math.random(1, #o)])
+    end
+})
+
+
+Tabs.Main:Button({
+    Title = "Reset Player",
+    Callback = function()
+        local lp = game.Players.LocalPlayer
+        lp.Character:BreakJoints()
     end
 })
 
 Tabs.Config:Toggle({
-    Title = "Esp khoáng sản hiếm",
-    Value = false,
-    Callback = function(state)
-		if state then
-      espEnabled=true
-			upd()
-		else
-			disesp()
-		end
-	end
+    Title="ESP Ore",
+    Value=false,
+    Callback=function(s)
+        espOn=s
+        if espOn then
+            task.spawn(function()
+                while espOn do
+                    updEsp()
+                    task.wait(0.2)
+                end
+            end)
+        else
+            clrEsp()
+        end
+    end
+})
+
+Tabs.Config:Slider({
+    Title = "Walkspeed",
+    Value = {
+        Min = 16,
+        Max = 200,
+        Default = 16,
+    },
+    Callback = function(v)
+        local c = game.Players.LocalPlayer.Character
+        local h = c and c:FindFirstChildOfClass("Humanoid")
+        if h then h.WalkSpeed = v end
+    end
 })
