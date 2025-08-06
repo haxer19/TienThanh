@@ -403,13 +403,15 @@ Tabs.Main:Button({
 
 
 Tabs.Main:Section({Title = "Fly Ore"})
-Tabs.Main:Toggle({
+Tabs.Main:Toggle({ 
     Title = "Auto Fly",
     Desc = "Tắt nếu muốn dừng bay",
     Default = false,
     Callback = function(state)
         if state then 
             flyToOre()
+        else
+            run = false 
         end
     end
 })
