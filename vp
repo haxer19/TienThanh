@@ -134,7 +134,7 @@ Tabs.T2:Slider("Slider", {
         Title = "Set Number",
         Value = { Min = 0, Max = 100, Default = 50 },
         Callback = function(Num)
-            _G.StatsNum = Num
+            StatsNum = Num
         end
     })
 Tabs.T2:Toggle("Toggle", {
@@ -143,7 +143,7 @@ Tabs.T2:Toggle("Toggle", {
     Callback = function(Strength)
           _G.Strength = Strength
             while _G.Strength do task.wait()
-        Up("Strength", _G.StatsNum)
+        Up("Strength", StatsNum)
         end
     end
 })
@@ -153,7 +153,7 @@ Tabs.T2:Toggle("Toggle", {
     Callback = function(Defense)
           _G.Defense = Defense
             while _G.Defense do task.wait()
-        Up("Defense", _G.StatsNum)
+        Up("Defense", StatsNum)
         end
     end
 })
@@ -163,7 +163,7 @@ Tabs.T2:Toggle("Toggle", {
     Callback = function(Sword)
     _G.Sword = Sword
       while _G.Sword do task.wait()
-        Up("Sword", _G.StatsNum)
+        Up("Sword", StatsNum)
         end
     end
 })
@@ -173,7 +173,7 @@ Tabs.T2:Toggle("Toggle", {
     Callback = function(Special)
           _G.Special = Special
             while _G.Special do task.wait()
-        Up("Special", _G.StatsNum)
+        Up("Special", StatsNum)
         end
     end
 })
