@@ -226,10 +226,9 @@ Tabs.T3:Button({
 Tabs.T4:Section({ Title="| Weapon"})
 local Weaponlist = {}
 
-local SelectWeapon = Tabs.T4:AddDropdown("SelectWeapon", {
+local SelectWeapon = Tabs.T4:Dropdown({
     Title = "Select Weapon",
     Values = Weaponlist,
-    
     Default = false,
     Callback = function(selectedWeapon)
         _G.Weapon = selectedWeapon
