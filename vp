@@ -42,9 +42,6 @@ local function TP(cframe)
         end
     end)
 end
-function Up(a, b)
-    game:GetService("Players").LocalPlayer.PlayerGui.Main.Stats.Main.Setting.Event:FireServer(a, b)
-end
 
 ------[[ Local Global ]]------
 
@@ -100,7 +97,6 @@ WindUI:SetTheme("NeoCyber")
 local Tabs = {
     T1 = Window:Tab({Title = "🗡️| Farm"}),
     T5 = Window:Tab({Title = "⚔️| Boss"}),
-    T2 = Window:Tab({Title = "📊| Stats"}),
     T3 = Window:Tab({Title = "📌| Teleport"}),
     T4 = Window:Tab({Title = "🔮| Main"}),
 }
@@ -136,54 +132,7 @@ Tabs.T5:Toggle({
         _G.AutoOpenCh = Bossnak
     end
 })
-Tabs.T2:Slider({
-    Title = "Set Number",
-    Step = 1,
-    Value = {Min = 1,Max = 100,Default = 1,},
-    Callback = function(Num)
-        StatsNum = Num
-    end
-})
-Tabs.T2:Toggle({
-    Title = "Strength",
-    Default = false,
-    Callback = function(Strength)
-          _G.Strength = Strength
-            while _G.Strength do task.wait()
-        Up("Strength", StatsNum)
-        end
-    end
-})
-Tabs.T2:Toggle({
-    Title = "Defense",
-    Default = false,
-    Callback = function(Defense)
-          _G.Defense = Defense
-            while _G.Defense do task.wait()
-        Up("Defense", StatsNum)
-        end
-    end
-})
-Tabs.T2:Toggle({
-    Title = "Sword",
-    Default = false,
-    Callback = function(Sword)
-    _G.Sword = Sword
-      while _G.Sword do task.wait()
-        Up("Sword", StatsNum)
-        end
-    end
-})
-Tabs.T2:Toggle({
-    Title = "Special",
-    Default = false,
-    Callback = function(Special)
-          _G.Special = Special
-            while _G.Special do task.wait()
-        Up("Special", StatsNum)
-        end
-    end
-})
+
 Tabs.T3:Section({ Title="| Shop"})
 Tabs.T3:Dropdown({
    Title = "Select NPC",
