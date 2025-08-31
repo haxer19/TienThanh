@@ -1,3 +1,10 @@
+--ใครReskinขอให้ล่มจม
+
+--[[ Farm lv ]]--
+
+
+------[[ function ]]------
+
 local function GetN_Child(Folder, Class)
     local names = {}
     for _, v in pairs(Folder:GetChildren()) do
@@ -43,20 +50,20 @@ end
 
 local Wsp = game:GetService("Workspace")
 local Ply = game:GetService("Players")
-local ChaPly = Ply.LocalPlayer.Character or Ply.LocalPlayer.CharacterAdded:Wait()
+local ChaPly = Ply.LocalPlayer.Character or Ply.LocalPlayer.ChvaracterAdded:Wait()
 local NameMap = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 local Wea = GetN_Child(game.Players.LocalPlayer.Backpack,"Tool")
 local island = GetN_Child(workspace.Map,"Model")
 local Chest = {"Rare Chest","Epic Chest", "Legendary Chest", "Mythical Chest"}
 local Shop = GetN_Des(Wsp.Npc,"Model")
 local Mon = {"Bandit [Lv.5]","Bandit Leader [Lv.50]","Monkey [Lv.100]","Monkey King [Lv.150]","Snow Bandit [Lv.300]","Snow Bandit Leader [Lv.450]","Curse Spirit [Lv.750]","Desert Thief [Lv.1000]","Desert King [Lv.1500]","Marine Soldier [Lv.2000]","Arrancar [Lv.2000]","Dark Adventure [Lv.2500]"}
-local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local _gv = getgenv()
 local Window = WindUI:CreateWindow({
     Title = "Verse Piece",
     Icon = "rbxassetid://139030006778308",
     Author = "Tien Thanh",
-    Folder = "TienThanh",
+    Folder = "VersePiece",
     Size = UDim2.fromOffset(540, 340),
     Transparent = true,
     Theme = "Dark",
@@ -98,46 +105,46 @@ local Tabs = {
     T4 = Window:Tab({Title = "🔮| Main"}),
 }
 
-Window:SelectTab(1)
-Tabs.T1:Section(Title = "| No Quest")
-Tabs.T1:Dropdown("Dropdown", {
+Tabs.T1:Section({ Title="| No Quest"})
+Tabs.T1:Dropdown({
    Title = "Select Mon",
    Values = Mon,
-   Value = "",
+   Value="",
    Callback = function(mikd)
    _gv.SLM = mikd
    end
 })
 
-Tabs.T1:Toggle("Toggle", {
+Tabs.T1:Toggle({
     Title = "Farm Mon",
     Default = false,
     Callback = function(He)
         _gv.ATF = He
     end
 })
-Tabs.T5:Toggle("Toggle", {
+Tabs.T5:Toggle({
     Title = "Farm AllBoss",
     Default = false,
     Callback = function(Bossna)
         _gv.ATFAll = Bossna
     end
 })
-Tabs.T5:Toggle("Toggle", {
+Tabs.T5:Toggle({
     Title = "Auto Open Chest",
     Default = false,
     Callback = function(Bossnak)
         _G.AutoOpenCh = Bossnak
     end
 })
-Tabs.T2:Slider("Slider", {
-        Title = "Set Number",
-        Value = { Min = 0, Max = 100, Default = 50 },
-        Callback = function(Num)
-            StatsNum = Num
-        end
-    })
-Tabs.T2:Toggle("Toggle", {
+Tabs.T2:Slider({
+    Title = "Set Number",
+    Step = 0.1,
+    Value = {Min = 1,Max = 100,Default = 1,},
+    Callback = function(Num)
+        StatsNum = Num
+    end
+})
+Tabs.T2:Toggle({
     Title = "Strength",
     Default = false,
     Callback = function(Strength)
@@ -147,7 +154,7 @@ Tabs.T2:Toggle("Toggle", {
         end
     end
 })
-Tabs.T2:Toggle("Toggle", {
+Tabs.T2:Toggle({
     Title = "Defense",
     Default = false,
     Callback = function(Defense)
@@ -157,7 +164,7 @@ Tabs.T2:Toggle("Toggle", {
         end
     end
 })
-Tabs.T2:Toggle("Toggle", {
+Tabs.T2:Toggle({
     Title = "Sword",
     Default = false,
     Callback = function(Sword)
@@ -167,7 +174,7 @@ Tabs.T2:Toggle("Toggle", {
         end
     end
 })
-Tabs.T2:Toggle("Toggle", {
+Tabs.T2:Toggle({
     Title = "Special",
     Default = false,
     Callback = function(Special)
@@ -177,12 +184,11 @@ Tabs.T2:Toggle("Toggle", {
         end
     end
 })
-Tabs.T3:Section(Title = "| Shop")
-Tabs.T3:Dropdown("Dropdown", {
+Tabs.T3:Section({ Title="| Shop"})
+Tabs.T3:Dropdown({
    Title = "Select NPC",
    Values = Shop,
-   
-   Value = "",
+   Value="",
    Callback = function(MKKm)
      _G.ILm = MKKm
    end
@@ -197,12 +203,11 @@ Tabs.T3:Button({
         end
     end
 })
-Tabs.T3:Section(Title = "| island")
-Tabs.T3:Dropdown("Dropdown", {
+Tabs.T3:Section({ Title="| island"})
+Tabs.T3:Dropdown({
    Title = "Select island",
    Values = island,
-   
-   Value = "",
+   Value="",
    Callback = function(MKK)
      _G.IL = MKK
    end
@@ -218,10 +223,10 @@ Tabs.T3:Button({
     end
 })
 
-Tabs.T4:Section(Title = "| Weapon")
+Tabs.T4:Section({ Title="| Weapon"})
 local Weaponlist = {}
 
-local SelectWeapon = Tabs.T4:Dropdown("SelectWeapon", {
+local SelectWeapon = Tabs.T4:AddDropdown("SelectWeapon", {
     Title = "Select Weapon",
     Values = Weaponlist,
     
@@ -249,13 +254,12 @@ end
 
 Tabs.T4:Button({
     Title = "Refresh Weapon",
-    Description = "",
     Callback = RefreshWeaponList
 })
 
 RefreshWeaponList()
 
-Tabs.T4:Toggle("Toggle", {
+Tabs.T4:Toggle({
     Title = "ONE SHOT[67%]",
     Default = false,
     Callback = function(MNae)
@@ -265,43 +269,36 @@ getgenv().Config = {
     ["Radius"] = 15
     }
     end})
-Tabs.T4:Section(Title = "| Skill")
-    Tabs.T4:Toggle("Toggle", {
+Tabs.T4:Section({ Title="| Skill"})
+    Tabs.T4:Toggle({
     Title = "Z",
     Default = false,
     Callback = function(Z)
     _G.Z = Z
     end})
-    Tabs.T4:Toggle("Toggle", {
+    Tabs.T4:Toggle({
     Title = "X",
     Default = false,
     Callback = function(X)
     _G.X = X
    end})
-    Tabs.T4:Toggle("Toggle", {
+    Tabs.T4:Toggle({
     Title = "C",
     Default = false,
     Callback = function(C)
     _G.C = C
     end})
-    Tabs.T4:Toggle("Toggle", {
+    Tabs.T4:Toggle({
     Title = "V",
     Default = false,
     Callback = function(V)
     _G.V = V
     end})
-    Tabs.T4:Toggle("Toggle", {
+Tabs.T4:Toggle({
     Title = "F",
     Default = false,
     Callback = function(F)
     _G.F = F
-end})
-Tabs.T4:Section(Title = "| Performance")
-Tabs.T4:Toggle("Toggle", {
-    Title = "Delete Effect",
-    Default = false,
-    Callback = function(eleff)
-     _G.Deleff = eleff
 end})
 
 ------[[ Spawn Function ]]------
@@ -393,7 +390,7 @@ spawn(function()
                 sethiddenproperty(player, "SimulationRadius", 112412400000)
                 sethiddenproperty(player, "MaxSimulationRadius", 112412400000)
                 local Den
-                if not getgenv().Config["Folder Mon"] then
+                if getgenv().Config["Folder Mon"] == "nil" then
                     Den = game.Workspace:GetDescendants()
                 else
                     Den = game.Workspace[getgenv().Config["Folder Mon"]]:GetDescendants()
