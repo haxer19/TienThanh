@@ -94,11 +94,11 @@ WindUI:AddTheme({
 WindUI:SetTheme("NeoCyber")
 
 local Tab = {
-    T1 = Window:Tab({Title = "🗡️| Farm", Icon = "swordsj"}),
-    T5 = Window:Tab({Title = "⚔️| Boss", Icon = "swordsj"}),
-    T2 = Window:Tab({Title = "📊| Stats", Icon = "chart-no-axes-combined"}),
-    T3 = Window:Tab({Title = "📌| Teleport", Icon = "tree-palm"}),
-    T4 = Window:Tab({Title = "🔮| Main", Icon = "boodk"}),
+    T1 = Window:Tab({Title = "🗡️| Farm"}),
+    T5 = Window:Tab({Title = "⚔️| Boss"}),
+    T2 = Window:Tab({Title = "📊| Stats"}),
+    T3 = Window:Tab({Title = "📌| Teleport"}),
+    T4 = Window:Tab({Title = "🔮| Main"}),
 }
 
 
