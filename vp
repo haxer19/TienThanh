@@ -16,9 +16,6 @@ local function GetN_Des(Folder, Class)
     end
     return names
 end
-local function Dropdownn(w,e,y)
-q:Dropdown({Name=w,Values=e,Callback=y})
-end
 function _Attack()
 game:GetService('VirtualUser'):CaptureController()
 game:GetService('VirtualUser'):ClickButton1(Vector2.new(851, 158),game:GetService("Workspace").Camera.CFrame)
@@ -46,7 +43,7 @@ end
 
 local Wsp = game:GetService("Workspace")
 local Ply = game:GetService("Players")
-local ChaPly = Ply.LocalPlayer.Character or Ply.LocalPlayer.ChvaracterAdded:Wait()
+local ChaPly = Ply.LocalPlayer.Character or Ply.LocalPlayer.CharacterAdded:Wait()
 local NameMap = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 local Wea = GetN_Child(game.Players.LocalPlayer.Backpack,"Tool")
 local island = GetN_Child(workspace.Map,"Model")
@@ -137,7 +134,7 @@ Tab.T2:Slider("Slider", {
         Title = "Set Number",
         Value = { Min = 0, Max = 100, Default = 50 },
         Callback = function(Num)
-            StatsNum = Num
+            _G.StatsNum = Num
         end
     })
 Tab.T2:Toggle("Toggle", {
@@ -403,7 +400,7 @@ spawn(function()
                 sethiddenproperty(player, "SimulationRadius", 112412400000)
                 sethiddenproperty(player, "MaxSimulationRadius", 112412400000)
                 local Den
-                if getgenv().Config["Folder Mon"] == "nil" then
+                if not getgenv().Config["Folder Mon"] then
                     Den = game.Workspace:GetDescendants()
                 else
                     Den = game.Workspace[getgenv().Config["Folder Mon"]]:GetDescendants()
@@ -551,7 +548,8 @@ fpsLabel99.Text = "FPS: -- | Ping: -- | Time: --:--:--"
 fpsLabel99.Parent = frame99
 
 local function updateInfo99()
-    local fps = math.floor(1 / game:GetService("RunService").RenderStepped:Wait())
+    local delta = game:GetService("RunService").RenderStepped:Wait()
+    local fps = math.floor(1 / math.max(delta, 1e-6))
     local ping = math.floor(game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue())
     local time = os.date("%X")
     fpsLabel99.Text = "FPS: " .. fps .. " | Ping: " .. ping .. " | Time: " .. time
