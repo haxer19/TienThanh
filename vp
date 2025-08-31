@@ -17,7 +17,7 @@ local function GetN_Des(Folder, Class)
     return names
 end
 local function Dropdownn(q,w,e,r,t,y)
-q:Dropdown({Name=w,Options=e,Default=r,Flag=t,Callback=y})
+q:Dropdown({Name=w,Values=e,Callback=y})
 end
 function _Attack()
 game:GetService('VirtualUser'):CaptureController()
@@ -135,11 +135,7 @@ Tab.T5:Toggle("Toggle", {
 })
 Tab.T2:Slider("Slider", {
         Title = "Set Number",
-        Description = "Number Stats",
-        Default = 1,
-        Min = 1,
-        Max = 100,
-        Rounding = 0.1,
+        Value = { Min = 0, Max = 100, Default = 50 },
         Callback = function(Num)
             StatsNum = Num
         end
@@ -312,7 +308,7 @@ Tab.T4:Toggle("Toggle", {
 end})
 Tab.T4:Toggle("Toggle", {
     Title = "Show [Fps,Ping,Time]",
-    Default = true,
+    Default = false,
     Callback = function(Statsm)
 _G.ShowStats = Statsm
 end})
