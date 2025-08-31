@@ -67,7 +67,7 @@ local Window = WindUI:CreateWindow({
 })
 
 Window:EditOpenButton({
-    Title = "O",
+    Title = "",
     Icon = "rbxassetid://139030006778308",
     CornerRadius = UDim.new(0, 10),
     StrokeThickness = 2,
@@ -98,8 +98,8 @@ local Tab = {
     T4 = Window:Tab({Title = "🔮| Main"}),
 }
 
-
-Tab.T1:Section("| No Quest")
+Window:SelectTab(1)
+Tab.T1:Section(Title = "| No Quest")
 Tab.T1:Dropdown("Dropdown", {
    Title = "Select Mon",
    Values = Mon,
@@ -177,7 +177,7 @@ Tab.T2:Toggle("Toggle", {
         end
     end
 })
-Tab.T3:Section("| Shop")
+Tab.T3:Section(Title = "| Shop")
 Tab.T3:Dropdown("Dropdown", {
    Title = "Select NPC",
    Values = Shop,
@@ -197,7 +197,7 @@ Tab.T3:Button({
         end
     end
 })
-Tab.T3:Section("| island")
+Tab.T3:Section(Title = "| island")
 Tab.T3:Dropdown("Dropdown", {
    Title = "Select island",
    Values = island,
@@ -218,7 +218,7 @@ Tab.T3:Button({
     end
 })
 
-Tab.T4:Section("| Weapon")
+Tab.T4:Section(Title = "| Weapon")
 local Weaponlist = {}
 
 local SelectWeapon = Tab.T4:Dropdown("SelectWeapon", {
@@ -265,7 +265,7 @@ getgenv().Config = {
     ["Radius"] = 15
     }
     end})
-Tab.T4:Section("| Skill")
+Tab.T4:Section(Title = "| Skill")
     Tab.T4:Toggle("Toggle", {
     Title = "Z",
     Default = false,
@@ -296,20 +296,13 @@ Tab.T4:Section("| Skill")
     Callback = function(F)
     _G.F = F
 end})
-Tab.T4:Section("| Performance")
+Tab.T4:Section(Title = "| Performance")
 Tab.T4:Toggle("Toggle", {
     Title = "Delete Effect",
     Default = false,
     Callback = function(eleff)
      _G.Deleff = eleff
 end})
-Tab.T4:Toggle("Toggle", {
-    Title = "Show [Fps,Ping,Time]",
-    Default = false,
-    Callback = function(Statsm)
-_G.ShowStats = Statsm
-end})
-
 
 ------[[ Spawn Function ]]------
 
@@ -508,65 +501,4 @@ spawn(function()
             end
         end
     end)
-end)
-
-local screenGui99 = Instance.new("ScreenGui")
-screenGui99.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-screenGui99.Name = "RimuraHub | Show State"
-
-local backgroundFrame99 = Instance.new("Frame")
-backgroundFrame99.Size = UDim2.new(0, 305, 0, 47)
-backgroundFrame99.Position = UDim2.new(1, -313, 0, 2)
-backgroundFrame99.BackgroundColor3 = Color3.new(150/255, 0, 255/255)
-backgroundFrame99.Parent = screenGui99
-backgroundFrame99.Name = "กรอบ"
-
-local cornerBack99 = Instance.new("UICorner")
-cornerBack99.CornerRadius = UDim.new(0, 10)
-cornerBack99.Parent = backgroundFrame99
-
-local frame99 = Instance.new("Frame")
-frame99.Size = UDim2.new(0, 300, 0, 40)
-frame99.Position = UDim2.new(1, -302, 0, 3)
-frame99.BackgroundColor3 = Color3.new(0, 0, 0)
-frame99.BorderSizePixel = 0
-frame99.BackgroundTransparency = 0
-frame99.Parent = backgroundFrame99
-frame99.Name = "State"
-
-local corner99 = Instance.new("UICorner")
-corner99.CornerRadius = UDim.new(0, 10)
-corner99.Parent = frame99
-
-local fpsLabel99 = Instance.new("TextLabel")
-fpsLabel99.Size = UDim2.new(1, 0, 1, 0)
-fpsLabel99.BackgroundTransparency = 1
-fpsLabel99.TextColor3 = Color3.new(150/255, 0, 255/255)
-fpsLabel99.Font = Enum.Font.SourceSansBold
-fpsLabel99.TextSize = 20
-fpsLabel99.Text = "FPS: -- | Ping: -- | Time: --:--:--"
-fpsLabel99.Parent = frame99
-
-local function updateInfo99()
-    local delta = game:GetService("RunService").RenderStepped:Wait()
-    local fps = math.floor(1 / math.max(delta, 1e-6))
-    local ping = math.floor(game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue())
-    local time = os.date("%X")
-    fpsLabel99.Text = "FPS: " .. fps .. " | Ping: " .. ping .. " | Time: " .. time
-end
-
-spawn(function()
-    while true do
-        task.wait(0.1)
-        pcall(function()
-            if _G.ShowStats then
-                backgroundFrame99.Visible = true
-                frame99.Visible = true
-                updateInfo99()
-            else
-                backgroundFrame99.Visible = false
-                frame99.Visible = false
-            end
-        end)
-    end
 end)
