@@ -67,7 +67,7 @@ local Window = WindUI:CreateWindow({
 })
 
 Window:EditOpenButton({
-    Title = " ",
+    Title = "➕",
     Icon = "rbxassetid://139030006778308",
     CornerRadius = UDim.new(0, 10),
     StrokeThickness = 2,
