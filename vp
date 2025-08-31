@@ -67,7 +67,7 @@ local Window = WindUI:CreateWindow({
 })
 
 Window:EditOpenButton({
-    Title = "",
+    Title = " ",
     Icon = "rbxassetid://139030006778308",
     CornerRadius = UDim.new(0, 10),
     StrokeThickness = 2,
@@ -90,7 +90,7 @@ WindUI:AddTheme({
 
 WindUI:SetTheme("NeoCyber")
 
-local Tab = {
+local Tabs = {
     T1 = Window:Tab({Title = "🗡️| Farm"}),
     T5 = Window:Tab({Title = "⚔️| Boss"}),
     T2 = Window:Tab({Title = "📊| Stats"}),
@@ -99,8 +99,8 @@ local Tab = {
 }
 
 Window:SelectTab(1)
-Tab.T1:Section(Title = "| No Quest")
-Tab.T1:Dropdown("Dropdown", {
+Tabs.T1:Section(Title = "| No Quest")
+Tabs.T1:Dropdown("Dropdown", {
    Title = "Select Mon",
    Values = Mon,
    Value = "",
@@ -109,76 +109,76 @@ Tab.T1:Dropdown("Dropdown", {
    end
 })
 
-Tab.T1:Toggle("Toggle", {
+Tabs.T1:Toggle("Toggle", {
     Title = "Farm Mon",
     Default = false,
     Callback = function(He)
         _gv.ATF = He
     end
 })
-Tab.T5:Toggle("Toggle", {
+Tabs.T5:Toggle("Toggle", {
     Title = "Farm AllBoss",
     Default = false,
     Callback = function(Bossna)
         _gv.ATFAll = Bossna
     end
 })
-Tab.T5:Toggle("Toggle", {
+Tabs.T5:Toggle("Toggle", {
     Title = "Auto Open Chest",
     Default = false,
     Callback = function(Bossnak)
         _G.AutoOpenCh = Bossnak
     end
 })
-Tab.T2:Slider("Slider", {
+Tabs.T2:Slider("Slider", {
         Title = "Set Number",
         Value = { Min = 0, Max = 100, Default = 50 },
         Callback = function(Num)
             _G.StatsNum = Num
         end
     })
-Tab.T2:Toggle("Toggle", {
+Tabs.T2:Toggle("Toggle", {
     Title = "Strength",
     Default = false,
     Callback = function(Strength)
           _G.Strength = Strength
             while _G.Strength do task.wait()
-        Up("Strength", StatsNum)
+        Up("Strength", _G.StatsNum)
         end
     end
 })
-Tab.T2:Toggle("Toggle", {
+Tabs.T2:Toggle("Toggle", {
     Title = "Defense",
     Default = false,
     Callback = function(Defense)
           _G.Defense = Defense
             while _G.Defense do task.wait()
-        Up("Defense", StatsNum)
+        Up("Defense", _G.StatsNum)
         end
     end
 })
-Tab.T2:Toggle("Toggle", {
+Tabs.T2:Toggle("Toggle", {
     Title = "Sword",
     Default = false,
     Callback = function(Sword)
     _G.Sword = Sword
       while _G.Sword do task.wait()
-        Up("Sword", StatsNum)
+        Up("Sword", _G.StatsNum)
         end
     end
 })
-Tab.T2:Toggle("Toggle", {
+Tabs.T2:Toggle("Toggle", {
     Title = "Special",
     Default = false,
     Callback = function(Special)
           _G.Special = Special
             while _G.Special do task.wait()
-        Up("Special", StatsNum)
+        Up("Special", _G.StatsNum)
         end
     end
 })
-Tab.T3:Section(Title = "| Shop")
-Tab.T3:Dropdown("Dropdown", {
+Tabs.T3:Section(Title = "| Shop")
+Tabs.T3:Dropdown("Dropdown", {
    Title = "Select NPC",
    Values = Shop,
    
@@ -187,7 +187,7 @@ Tab.T3:Dropdown("Dropdown", {
      _G.ILm = MKKm
    end
 })
-Tab.T3:Button({
+Tabs.T3:Button({
     Title = "teleport NPC",
     Callback = function()
    for i, v in pairs(game:GetService("Workspace").Npc:GetDescendants()) do
@@ -197,8 +197,8 @@ Tab.T3:Button({
         end
     end
 })
-Tab.T3:Section(Title = "| island")
-Tab.T3:Dropdown("Dropdown", {
+Tabs.T3:Section(Title = "| island")
+Tabs.T3:Dropdown("Dropdown", {
    Title = "Select island",
    Values = island,
    
@@ -207,7 +207,7 @@ Tab.T3:Dropdown("Dropdown", {
      _G.IL = MKK
    end
 })
-Tab.T3:Button({
+Tabs.T3:Button({
     Title = "teleport island",
     Callback = function()
    for i, v in pairs(game:GetService("Workspace").Map:GetDescendants()) do
@@ -218,10 +218,10 @@ Tab.T3:Button({
     end
 })
 
-Tab.T4:Section(Title = "| Weapon")
+Tabs.T4:Section(Title = "| Weapon")
 local Weaponlist = {}
 
-local SelectWeapon = Tab.T4:Dropdown("SelectWeapon", {
+local SelectWeapon = Tabs.T4:Dropdown("SelectWeapon", {
     Title = "Select Weapon",
     Values = Weaponlist,
     
@@ -247,7 +247,7 @@ end
     SelectWeapon:SetValues(Weaponlist)
 end
 
-Tab.T4:Button({
+Tabs.T4:Button({
     Title = "Refresh Weapon",
     Description = "",
     Callback = RefreshWeaponList
@@ -255,7 +255,7 @@ Tab.T4:Button({
 
 RefreshWeaponList()
 
-Tab.T4:Toggle("Toggle", {
+Tabs.T4:Toggle("Toggle", {
     Title = "ONE SHOT[67%]",
     Default = false,
     Callback = function(MNae)
@@ -265,39 +265,39 @@ getgenv().Config = {
     ["Radius"] = 15
     }
     end})
-Tab.T4:Section(Title = "| Skill")
-    Tab.T4:Toggle("Toggle", {
+Tabs.T4:Section(Title = "| Skill")
+    Tabs.T4:Toggle("Toggle", {
     Title = "Z",
     Default = false,
     Callback = function(Z)
     _G.Z = Z
     end})
-    Tab.T4:Toggle("Toggle", {
+    Tabs.T4:Toggle("Toggle", {
     Title = "X",
     Default = false,
     Callback = function(X)
     _G.X = X
    end})
-    Tab.T4:Toggle("Toggle", {
+    Tabs.T4:Toggle("Toggle", {
     Title = "C",
     Default = false,
     Callback = function(C)
     _G.C = C
     end})
-    Tab.T4:Toggle("Toggle", {
+    Tabs.T4:Toggle("Toggle", {
     Title = "V",
     Default = false,
     Callback = function(V)
     _G.V = V
     end})
-    Tab.T4:Toggle("Toggle", {
+    Tabs.T4:Toggle("Toggle", {
     Title = "F",
     Default = false,
     Callback = function(F)
     _G.F = F
 end})
-Tab.T4:Section(Title = "| Performance")
-Tab.T4:Toggle("Toggle", {
+Tabs.T4:Section(Title = "| Performance")
+Tabs.T4:Toggle("Toggle", {
     Title = "Delete Effect",
     Default = false,
     Callback = function(eleff)
