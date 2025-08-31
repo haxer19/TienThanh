@@ -16,7 +16,7 @@ local function GetN_Des(Folder, Class)
     end
     return names
 end
-local function Dropdownn(q,w,e,r,t,y)
+local function Dropdownn(w,e,r,y)
 q:Dropdown({Name=w,Values=e,Callback=y})
 end
 function _Attack()
