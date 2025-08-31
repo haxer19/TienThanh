@@ -181,7 +181,6 @@ local SelectWeapon = Tabs.T4:Dropdown({
     Value="",
     Callback = function(selectedWeapon)
         _G.Weapon = selectedWeapon
-        print("Selected " .. _G.Weapon)
     end
 })
 
