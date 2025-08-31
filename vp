@@ -138,7 +138,7 @@ Tabs.T5:Toggle({
 })
 Tabs.T2:Slider({
     Title = "Set Number",
-    Step = 0.1,
+    Step = 1,
     Value = {Min = 1,Max = 100,Default = 1,},
     Callback = function(Num)
         StatsNum = Num
