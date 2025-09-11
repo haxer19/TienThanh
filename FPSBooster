@@ -1,0 +1,182 @@
+if not _G.Ignore then
+    _G.Ignore = {}
+end
+
+if not game:IsLoaded() then
+    repeat task.wait() until game:IsLoaded()
+end
+
+if not _G.Settings then
+    _G.Settings = {
+        Players = {
+            ["Ignore Me"] = true,
+            ["Ignore Others"] = true,
+            ["Ignore Tools"] = true
+        },
+        Meshes = {
+            NoMesh = true,
+            NoTexture = true,
+            Destroy = true
+        },
+        Images = {
+            Invisible = true,
+            Destroy = true
+        },
+        Explosions = {
+            Smaller = true,
+            Invisible = true,
+            Destroy = true
+        },
+        Particles = {
+            Invisible = true,
+            Destroy = true
+        },
+        TextLabels = {
+            LowerQuality = true,
+            Invisible = true,
+            Destroy = true
+        },
+        MeshParts = {
+            LowerQuality = true,
+            Invisible = true,
+            NoTexture = true,
+            NoMesh = true,
+            Destroy = true
+        },
+        Other = {
+            ["FPS Cap"] = true,
+            ["No Camera Effects"] = true,
+            ["No Clothes"] = true,
+            ["Low Water Graphics"] = true,
+            ["No Shadows"] = true,
+            ["Low Rendering"] = true,
+            ["Low Quality Parts"] = true,
+            ["Low Quality Models"] = true,
+            ["Reset Materials"] = true,
+            ["Lower Quality MeshParts"] = true,
+            ["ClearNilInstances"] = true
+        }
+    }
+end
+
+local Players, Lighting, MaterialService = game:GetService("Players"), game:GetService("Lighting"), game:GetService("MaterialService")
+local ME, CanBeEnabled = Players.LocalPlayer, {"ParticleEmitter", "Trail", "Smoke", "Fire", "Sparkles"}
+
+local function PartOfCharacter(Inst)
+    for _, v in pairs(Players:GetPlayers()) do
+        if v ~= ME and v.Character and Inst:IsDescendantOf(v.Character) then
+            return true
+        end
+    end
+    return false
+end
+
+local function DescendantOfIgnore(Inst)
+    for _, v in pairs(_G.Ignore) do
+        if Inst:IsDescendantOf(v) then
+            return true
+        end
+    end
+    return false
+end
+
+local function CheckIfBad(Inst)
+    if not Inst:IsDescendantOf(Players) and 
+       (_G.Settings.Players["Ignore Others"] and not PartOfCharacter(Inst) or not _G.Settings.Players["Ignore Others"]) and 
+       (_G.Settings.Players["Ignore Me"] and ME.Character and not Inst:IsDescendantOf(ME.Character) or not _G.Settings.Players["Ignore Me"]) and 
+       (_G.Settings.Players["Ignore Tools"] and not Inst:IsA("BackpackItem") and not Inst:FindFirstAncestorWhichIsA("BackpackItem") or not _G.Settings.Players["Ignore Tools"]) and 
+       (_G.Ignore and not table.find(_G.Ignore, Inst) and not DescendantOfIgnore(Inst) or (not _G.Ignore or type(_G.Ignore) ~= "table" or #_G.Ignore <= 0)) 
+    then
+        if Inst:IsA("DataModelMesh") or Inst:IsA("SpecialMesh") then
+            Inst:Destroy()
+        elseif Inst:IsA("FaceInstance") or Inst:IsA("ShirtGraphic") then
+            Inst:Destroy()
+        elseif table.find(CanBeEnabled, Inst.ClassName) then
+            Inst:Destroy()
+        elseif Inst:IsA("PostEffect") then
+            Inst.Enabled = false
+        elseif Inst:IsA("Explosion") then
+            Inst:Destroy()
+        elseif Inst:IsA("Clothing") or Inst:IsA("SurfaceAppearance") or Inst:IsA("BaseWrap") then
+            Inst:Destroy()
+        elseif Inst:IsA("BasePart") and not Inst:IsA("MeshPart") then
+            Inst.Material = Enum.Material.Plastic
+            Inst.Reflectance = 0
+            Inst.Transparency = 0.3
+        elseif Inst:IsA("TextLabel") and Inst:IsDescendantOf(workspace) then
+            Inst:Destroy()
+        elseif Inst:IsA("Model") then
+            Inst.LevelOfDetail = 1
+        elseif Inst:IsA("MeshPart") then
+            Inst:Destroy()
+        end
+    end
+end
+
+coroutine.wrap(pcall)(function()
+    if _G.Settings.Other["Low Water Graphics"] then
+        local terrain = workspace:FindFirstChildOfClass("Terrain")
+        if not terrain then
+            repeat task.wait() until workspace:FindFirstChildOfClass("Terrain")
+            terrain = workspace:FindFirstChildOfClass("Terrain")
+        end
+        terrain.WaterWaveSize, terrain.WaterWaveSpeed, terrain.WaterReflectance, terrain.WaterTransparency = 0,0,0,0
+        if sethiddenproperty then
+            sethiddenproperty(terrain, "Decoration", false)
+        end
+    end
+end)
+
+coroutine.wrap(pcall)(function()
+    if _G.Settings.Other["No Shadows"] then
+        Lighting.GlobalShadows = false
+        Lighting.FogEnd = 9e9
+        Lighting.ShadowSoftness = 0
+        if sethiddenproperty then
+            sethiddenproperty(Lighting, "Technology", 2)
+        end
+    end
+end)
+
+coroutine.wrap(pcall)(function()
+    if _G.Settings.Other["Low Rendering"] then
+        settings().Rendering.QualityLevel = 1
+        settings().Rendering.MeshPartDetailLevel = Enum.MeshPartDetailLevel.Level04
+    end
+end)
+
+coroutine.wrap(pcall)(function()
+    if _G.Settings.Other["Reset Materials"] then
+        for _, v in pairs(MaterialService:GetChildren()) do v:Destroy() end
+        MaterialService.Use2022Materials = false
+    end
+end)
+
+coroutine.wrap(pcall)(function()
+    if _G.Settings.Other["FPS Cap"] then
+        if setfpscap then setfpscap(60) end
+    end
+end)
+
+coroutine.wrap(pcall)(function()
+    if _G.Settings.Other["ClearNilInstances"] and getnilinstances then
+        for _, v in pairs(getnilinstances()) do pcall(v.Destroy, v) end
+    end
+end)
+
+for _, v in pairs(game:GetDescendants()) do
+    CheckIfBad(v)
+end
+
+game.DescendantAdded:Connect(function(value)
+    task.wait(0.5)
+    CheckIfBad(value)
+end)
+
+if ME.Character then
+    for _, part in pairs(ME.Character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.Transparency = 0.5
+        end
+    end
+end
