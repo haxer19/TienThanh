@@ -80,9 +80,9 @@ local function createButton(name,text,pos)
 	return b
 end
 
-local Button1=createButton("Button1","Di chuyển vị trí nút bấm",UDim2.new({0,0,2.308,0))
-local Button2=createButton("Button2","Khoá vị trí nút bấm",UDim2.new(0, 0,5.077, 0))
-local Button3=createButton("Button3","Thay đổi kích cỡ nút bấm",UDim2.new(0, 0,7.769, 0))
+local Button1=createButton("Button1","Di chuyển vị trí nút bấm", UDim2.new(0, 31, 0, 20))
+local Button2=createButton("Button2","Khoá vị trí nút bấm",       UDim2.new(0, 31, 0, 45))
+local Button3=createButton("Button3","Thay đổi kích cỡ nút bấm", UDim2.new(0, 31, 0, 70))
 
 local BTP=Instance.new("TextButton")
 BTP.Name="BTP"
