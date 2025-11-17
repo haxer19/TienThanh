@@ -39,8 +39,8 @@ c1.Parent=Toggle
 
 local Menu=Instance.new("Frame")
 Menu.Name="Menu"
-Menu.Size=UDim2.new(0,171,0,87)
-Menu.Position=UDim2.new(0.111,0,0.41,0)
+Menu.Size=UDim2.new(0,141,0,154)
+Menu.Position=UDim2.new(0.125,0,0.342,0)
 Menu.BackgroundColor3=Color3.new(0,0,0)
 Menu.BackgroundTransparency=0.2
 Menu.Visible=false
@@ -156,7 +156,7 @@ local function updateDrag(input)
 end
 
 BTP.InputBegan:Connect(function(input)
-	if input.UserInputType==Enum.UserInputType.MouseButton1 and dragging then
+	if dragging and (input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch) then
 		dragStart=input.Position
 		startPos=BTP.Position
 		dragInput=input
