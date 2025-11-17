@@ -115,11 +115,11 @@ end
 
 local function applySize()
 	if stateSize=="min" then
-		BTP.Size=UDim2.new(0,38,0,28)
+		BTP.Size=UDim2.new(0,38,0,38)
 	elseif stateSize=="max" then
-		BTP.Size=UDim2.new(0,50,0,70)
+		BTP.Size=UDim2.new(0,50,0,50)
 	else
-		BTP.Size=UDim2.new(0,40,0,50)
+		BTP.Size=UDim2.new(0,40,0,40)
 	end
 end
 
@@ -144,7 +144,7 @@ Button3.MouseButton1Click:Connect(function()
 	elseif stateSize=="min" then
 		stateSize="max"
 	else
-		stateSize="default"
+		stateGsize="default"
 	end
 	player:SetAttribute("TP_Size",stateSize)
 	applySize()
