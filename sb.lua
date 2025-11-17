@@ -115,15 +115,24 @@ end
 
 local function applySize()
 	if stateSize=="min" then
-		BTP.Size=UDim2.new(0,38,0,38)
+		BTP.Size=UDim2.new(0,38,0,28)
 	elseif stateSize=="max" then
-		BTP.Size=UDim2.new(0,50,0,50)
+		BTP.Size=UDim2.new(0,50,0,70)
 	else
-		BTP.Size=UDim2.new(0,40,0,40)
+		BTP.Size=UDim2.new(0,40,0,50)
+	end
+end
+
+local function updateButtonText()
+	if backPos then
+		BTP.Text = "Back"
+	else
+		BTP.Text = "Teleport"
 	end
 end
 
 applySize()
+updateButtonText() 
 
 Toggle.MouseButton1Click:Connect(function()
 	Menu.Visible=not Menu.Visible
@@ -173,10 +182,12 @@ BTP.MouseButton1Click:Connect(function()
 	if backPos then
 		hrp.CFrame=backPos
 		backPos=nil
-		return
+	else
+		backPos=hrp.CFrame
+		hrp.CFrame=part.CFrame+Vector3.new(0,3,0)
 	end
-	backPos=hrp.CFrame
-	hrp.CFrame=part.CFrame+Vector3.new(0,3,0)
+	
+	updateButtonText()
 end)
 
 player.CharacterAdded:Connect(function(newChar)
