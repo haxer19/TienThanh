@@ -123,16 +123,7 @@ local function applySize()
 	end
 end
 
-local function updateButtonText()
-	if backPos then
-		BTP.Text = "Back"
-	else
-		BTP.Text = "Teleport"
-	end
-end
-
 applySize()
-updateButtonText() 
 
 Toggle.MouseButton1Click:Connect(function()
 	Menu.Visible=not Menu.Visible
@@ -179,15 +170,17 @@ BTP.InputChanged:Connect(function(input)
 end)
 
 BTP.MouseButton1Click:Connect(function()
+	if dragging then return end
+	
 	if backPos then
 		hrp.CFrame=backPos
 		backPos=nil
-	else
-		backPos=hrp.CFrame
-		hrp.CFrame=part.CFrame+Vector3.new(0,3,0)
+		BTP.Text="Teleport"
+		return
 	end
-	
-	updateButtonText()
+	backPos=hrp.CFrame
+	hrp.CFrame=part.CFrame+Vector3.new(0,3,0)
+	BTP.Text="Back"
 end)
 
 player.CharacterAdded:Connect(function(newChar)
