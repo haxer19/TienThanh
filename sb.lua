@@ -1,18 +1,26 @@
 local player=game.Players.LocalPlayer
 local mouse=player:GetMouse()
+
+local gui=player:WaitForChild("PlayerGui"):FindFirstChild("TPGui")
+if gui then gui:Destroy() end
+
 local char=player.Character or player.CharacterAdded:Wait()
 local hrp=char:WaitForChild("HumanoidRootPart")
 
-local part=Instance.new("Part")
-part.Name="TP_Part"
-part.Parent=workspace
-part.Transparency=0.7
-part.Size=Vector3.new(900,1,900)
-part.Anchored=true
-part.CFrame=CFrame.new(9000,900,0)
+local part=workspace:FindFirstChild("TP_Part")
+if not part then
+	part=Instance.new("Part")
+	part.Name="TP_Part"
+	part.Parent=workspace
+	part.Transparency=0.7
+	part.Size=Vector3.new(900,1,900)
+	part.Anchored=true
+	part.CFrame=CFrame.new(9000,900,0)
+end
 
 local gui=Instance.new("ScreenGui")
 gui.Name="TPGui"
+gui.ResetOnSpawn=false
 gui.Parent=player:WaitForChild("PlayerGui")
 
 local Toggle=Instance.new("TextButton")
@@ -25,7 +33,6 @@ Toggle.Font=Enum.Font.Kalam
 Toggle.TextColor3=Color3.new(1,1,1)
 Toggle.TextScaled=true
 Toggle.Parent=gui
-
 local c1=Instance.new("UICorner")
 c1.CornerRadius=UDim.new(0,8)
 c1.Parent=Toggle
@@ -38,7 +45,6 @@ Menu.BackgroundColor3=Color3.new(0,0,0)
 Menu.BackgroundTransparency=0.2
 Menu.Visible=false
 Menu.Parent=gui
-
 local c2=Instance.new("UICorner")
 c2.CornerRadius=UDim.new(0,8)
 c2.Parent=Menu
@@ -49,7 +55,6 @@ Title.Size=UDim2.new(0,108,0,13)
 Title.Position=UDim2.new(0.113,0,0.039,0)
 Title.BackgroundColor3=Color3.new(0,0,0)
 Title.Parent=Menu
-
 local c3=Instance.new("UICorner")
 c3.CornerRadius=UDim.new(0,8)
 c3.Parent=Title
@@ -80,9 +85,9 @@ local function createButton(name,text,pos)
 	return b
 end
 
-local Button1=createButton("Button1","Di chuyển vị trí nút bấm",UDim2.new(0,0,2.308,0))
-local Button2=createButton("Button2","Khoá vị trí nút bấm",UDim2.new(0, 0,5.077, 0))
-local Button3=createButton("Button3","Thay đổi kích cỡ nút bấm",UDim2.new(0, 0,7.769, 0))
+local Button1=createButton("Button1","Di chuyển vị trí nút bấm",UDim2.new(0,31,0,20))
+local Button2=createButton("Button2","Khoá vị trí nút bấm",UDim2.new(0,31,0,45))
+local Button3=createButton("Button3","Thay đổi kích cỡ nút bấm",UDim2.new(0,31,0,70))
 
 local BTP=Instance.new("TextButton")
 BTP.Name="BTP"
@@ -94,7 +99,6 @@ BTP.Font=Enum.Font.Kalam
 BTP.TextColor3=Color3.new(1,1,1)
 BTP.TextScaled=true
 BTP.Parent=gui
-
 local c4=Instance.new("UICorner")
 c4.CornerRadius=UDim.new(1,0)
 c4.Parent=BTP
@@ -173,4 +177,9 @@ BTP.MouseButton1Click:Connect(function()
 	end
 	backPos=hrp.CFrame
 	hrp.CFrame=part.CFrame+Vector3.new(0,3,0)
+end)
+
+player.CharacterAdded:Connect(function(newChar)
+	char=newChar
+	hrp=newChar:WaitForChild("HumanoidRootPart")
 end)
