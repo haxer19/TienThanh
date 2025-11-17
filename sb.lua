@@ -63,25 +63,26 @@ TitleText.Font=Enum.Font.Kalam
 TitleText.TextScaled=true
 TitleText.Parent=Title
 
-local function createButton(name,text,parent)
+local function createButton(name,text,pos)
 	local b=Instance.new("TextButton")
 	b.Name=name
 	b.Size=UDim2.new(0,108,0,22)
 	b.BackgroundColor3=Color3.new(0,0,0)
 	b.Text=text
+	b.Position=pos
 	b.Font=Enum.Font.Kalam
 	b.TextColor3=Color3.new(1,1,1)
 	b.TextScaled=true
-	b.Parent=parent
+	b.Parent=Menu
 	local c=Instance.new("UICorner")
 	c.CornerRadius=UDim.new(0,8)
 	c.Parent=b
 	return b
 end
 
-local Button1=createButton("Button1","Di chuyển vị trí nút bấm",Menu)
-local Button2=createButton("Button2","Khoá vị trí nút bấm",Menu)
-local Button3=createButton("Button3","Thay đổi kích cỡ nút bấm",Menu)
+local Button1=createButton("Button1","Di chuyển vị trí nút bấm",UDim2.new({0,0,2.308,0))
+local Button2=createButton("Button2","Khoá vị trí nút bấm",UDim2.new(0, 0,5.077, 0))
+local Button3=createButton("Button3","Thay đổi kích cỡ nút bấm",UDim2.new(0, 0,7.769, 0))
 
 local BTP=Instance.new("TextButton")
 BTP.Name="BTP"
